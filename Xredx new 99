@@ -1,0 +1,134 @@
+local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+
+-- Create ScreenGui
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "xredxGui"
+gui.ResetOnSpawn = false
+
+-- Frame
+local frame = Instance.new("Frame", gui)
+frame.Name = "MainPage"
+frame.Size = UDim2.new(0, 200, 0, 160)
+frame.Position = UDim2.new(0.5, -100, 0.5, -80)
+frame.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+
+local corner = Instance.new("UICorner", frame)
+corner.CornerRadius = UDim.new(0, 15)
+
+-- Title
+local title = Instance.new("TextLabel", frame)
+title.Text = "99 xredx"
+title.Size = UDim2.new(1, 0, 0, 25)
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Font = Enum.Font.GothamBold
+title.TextScaled = true
+
+-- Speed TextBox
+local speedBox = Instance.new("TextBox", frame)
+speedBox.PlaceholderText = "Speed (10-100)"
+speedBox.Size = UDim2.new(0.9, 0, 0, 30)
+speedBox.Position = UDim2.new(0.05, 0, 0, 35)
+speedBox.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+speedBox.Font = Enum.Font.GothamBold
+speedBox.TextScaled = true
+speedBox.TextColor3 = Color3.new(1,1,1)
+speedBox.ClearTextOnFocus = false
+
+local boxCorner = Instance.new("UICorner", speedBox)
+boxCorner.CornerRadius = UDim.new(1, 0)
+
+-- Set Speed on Enter
+speedBox.FocusLost:Connect(function(enter)
+	if enter then
+		local val = tonumber(speedBox.Text)
+		if val and val >= 10 and val <= 100 and char:FindFirstChild("Humanoid") then
+			char.Humanoid.WalkSpeed = val
+		end
+	end
+end)
+
+-- Fly Button
+local flyBtn = Instance.new("TextButton", frame)
+flyBtn.Text = "Fly + Noclip"
+flyBtn.Size = UDim2.new(0.9, 0, 0, 30)
+flyBtn.Position = UDim2.new(0.05, 0, 0, 75)
+flyBtn.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+flyBtn.Font = Enum.Font.GothamBold
+flyBtn.TextScaled = true
+flyBtn.TextColor3 = Color3.new(1,1,1)
+
+local flyCorner = Instance.new("UICorner", flyBtn)
+flyCorner.CornerRadius = UDim.new(1, 0)
+
+-- Close Button
+local closeBtn = Instance.new("TextButton", frame)
+closeBtn.Text = "X"
+closeBtn.Size = UDim2.new(0, 25, 0, 25)
+closeBtn.Position = UDim2.new(1, -30, 0, 5)
+closeBtn.BackgroundColor3 = Color3.fromRGB(120, 0, 0)
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextScaled = true
+closeBtn.TextColor3 = Color3.new(1,1,1)
+
+local closeCorner = Instance.new("UICorner", closeBtn)
+closeCorner.CornerRadius = UDim.new(1, 0)
+
+-- Close GUI
+closeBtn.MouseButton1Click:Connect(function()
+	gui:Destroy()
+end)
+
+-- Fly + Noclip Script
+flyBtn.MouseButton1Click:Connect(function()
+	local hrp = char:WaitForChild("HumanoidRootPart")
+	local bv = Instance.new("BodyVelocity")
+	local bg = Instance.new("BodyGyro")
+	local flying = true
+
+	bv.Velocity = Vector3.new(0, 0, 0)
+	bv.MaxForce = Vector3.new(999999, 999999, 999999)
+	bv.Parent = hrp
+
+	bg.MaxTorque = Vector3.new(999999, 999999, 999999)
+	bg.P = 10000
+	bg.CFrame = hrp.CFrame
+	bg.Parent = hrp
+
+	-- Make everything CanCollide false
+	for _, part in pairs(char:GetDescendants()) do
+		if part:IsA("BasePart") then
+			part.CanCollide = false
+		end
+	end
+
+	-- Fly control
+	local UIS = game:GetService("UserInputService")
+	local RunService = game:GetService("RunService")
+
+	local dir = Vector3.new()
+	UIS.InputBegan:Connect(function(input)
+		if input.KeyCode == Enum.KeyCode.W then dir = Vector3.new(0,0,-1) end
+		if input.KeyCode == Enum.KeyCode.S then dir = Vector3.new(0,0,1) end
+		if input.KeyCode == Enum.KeyCode.A then dir = Vector3.new(-1,0,0) end
+		if input.KeyCode == Enum.KeyCode.D then dir = Vector3.new(1,0,0) end
+		if input.KeyCode == Enum.KeyCode.Space then dir = Vector3.new(0,1,0) end
+	end)
+	UIS.InputEnded:Connect(function(input)
+		if input.KeyCode == Enum.KeyCode.W or input.KeyCode == Enum.KeyCode.S or input.KeyCode == Enum.KeyCode.A or input.KeyCode == Enum.KeyCode.D or input.KeyCode == Enum.KeyCode.Space then
+			dir = Vector3.new(0,0,0)
+		end
+	end)
+
+	RunService.RenderStepped:Connect(function()
+		if flying then
+			local camCF = workspace.CurrentCamera.CFrame
+			bv.Velocity = (camCF:VectorToWorldSpace(dir)) * 50
+			bg.CFrame = camCF
+		end
+	end)
+end)
