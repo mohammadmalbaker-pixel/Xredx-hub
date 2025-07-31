@@ -1,0 +1,117 @@
+local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local rootPart = char:WaitForChild("HumanoidRootPart")
+
+-- Create ScreenGui
+local gui = Instance.new("ScreenGui")
+gui.Name = "xredxGui"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+-- Create Main Panel
+local panel = Instance.new("Frame")
+panel.Name = "MainPanel"
+panel.Size = UDim2.new(0, 160, 0, 100)
+panel.Position = UDim2.new(0.5, -80, 0.5, -50)
+panel.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+panel.Visible = false
+panel.Active = true
+panel.Draggable = true
+panel.Parent = gui
+
+-- Title Label
+local title = Instance.new("TextLabel")
+title.Text = "xredx"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 16
+title.Size = UDim2.new(1, -20, 0, 24)
+title.Position = UDim2.new(0, 10, 0, 4)
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.fromRGB(255, 0, 0)
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = panel
+
+-- Close Button
+local closeButton = Instance.new("TextButton")
+closeButton.Text = "❌"
+closeButton.Size = UDim2.new(0, 20, 0, 20)
+closeButton.Position = UDim2.new(1, -25, 0, 5)
+closeButton.BackgroundColor3 = Color3.fromRGB(50, 0, 0)
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.Font = Enum.Font.GothamBold
+closeButton.TextSize = 14
+closeButton.Parent = panel
+
+-- Noclip Button
+local noclipButton = Instance.new("TextButton")
+noclipButton.Text = "noclip"
+noclipButton.Size = UDim2.new(1, -20, 0, 26)
+noclipButton.Position = UDim2.new(0, 10, 0, 32)
+noclipButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+noclipButton.TextColor3 = Color3.fromRGB(255, 0, 0)
+noclipButton.Font = Enum.Font.Gotham
+noclipButton.TextSize = 13
+noclipButton.Parent = panel
+
+-- TP Button
+local tpButton = Instance.new("TextButton")
+tpButton.Text = "TP xredx"
+tpButton.Size = UDim2.new(1, -20, 0, 26)
+tpButton.Position = UDim2.new(0, 10, 0, 64)
+tpButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+tpButton.TextColor3 = Color3.fromRGB(255, 0, 0)
+tpButton.Font = Enum.Font.Gotham
+tpButton.TextSize = 13
+tpButton.Parent = panel
+
+-- Round Open Button
+local openButton = Instance.new("TextButton")
+openButton.Size = UDim2.new(0, 50, 0, 50)
+openButton.Position = UDim2.new(0, 20, 0.5, -25)
+openButton.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+openButton.Text = "xredx"
+openButton.TextColor3 = Color3.fromRGB(255, 0, 0)
+openButton.Font = Enum.Font.GothamBold
+openButton.TextSize = 12
+openButton.Name = "OpenButton"
+openButton.BorderSizePixel = 0
+openButton.Parent = gui
+
+local round = Instance.new("UICorner")
+round.CornerRadius = UDim.new(1, 0)
+round.Parent = openButton
+
+-- Toggle Panel
+openButton.MouseButton1Click:Connect(function()
+	panel.Visible = not panel.Visible
+end)
+
+-- Close Panel
+closeButton.MouseButton1Click:Connect(function()
+	panel.Visible = false
+end)
+
+-- Noclip Logic
+local noclipOn = false
+noclipButton.MouseButton1Click:Connect(function()
+	noclipOn = not noclipOn
+	noclipButton.Text = noclipOn and "noclip [ON]" or "noclip [OFF]"
+end)
+
+game:GetService("RunService").Stepped:Connect(function()
+	if noclipOn and char then
+		for _, v in pairs(char:GetDescendants()) do
+			if v:IsA("BasePart") and v.CanCollide then
+				v.CanCollide = false
+			end
+		end
+	end
+end)
+
+-- TP Logic
+tpButton.MouseButton1Click:Connect(function()
+	local spawn = workspace:FindFirstChild(player.Name.."_Spawn") or workspace:FindFirstChild("SpawnLocation")
+	if spawn then
+		rootPart.CFrame = spawn.CFrame + Vector3.new(0, 5, 0)
+	end
+end)
