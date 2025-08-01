@@ -1,1 +1,144 @@
+local player = game.Players.LocalPlayer
+local uis = game:GetService("UserInputService")
+local runService = game:GetService("RunService")
 
+-- Main ScreenGui
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "xredxGui"
+gui.ResetOnSpawn = false
+
+-- KEY SYSTEM FRAME
+local keyFrame = Instance.new("Frame", gui)
+keyFrame.Size = UDim2.new(0, 300, 0, 200)
+keyFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+keyFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+keyFrame.BorderSizePixel = 0
+
+local title = Instance.new("TextLabel", keyFrame)
+title.Size = UDim2.new(1, 0, 0, 40)
+title.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+title.Text = "xredx - Key System"
+title.TextColor3 = Color3.fromRGB(255, 0, 0)
+title.Font = Enum.Font.GothamBold
+title.TextScaled = true
+
+local inputBox = Instance.new("TextBox", keyFrame)
+inputBox.Size = UDim2.new(0.9, 0, 0, 40)
+inputBox.Position = UDim2.new(0.05, 0, 0, 60)
+inputBox.PlaceholderText = "Enter Key"
+inputBox.Text = ""
+inputBox.Font = Enum.Font.GothamBold
+inputBox.TextColor3 = Color3.fromRGB(255, 0, 0)
+inputBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+inputBox.TextScaled = true
+
+local doneBtn = Instance.new("TextButton", keyFrame)
+doneBtn.Size = UDim2.new(0.9, 0, 0, 40)
+doneBtn.Position = UDim2.new(0.05, 0, 0, 120)
+doneBtn.Text = "Done"
+doneBtn.Font = Enum.Font.GothamBold
+doneBtn.TextColor3 = Color3.fromRGB(255, 0, 0)
+doneBtn.BackgroundColor3 = Color3.fromRGB(40, 0, 0)
+doneBtn.TextScaled = true
+
+-- LOADING SCREEN
+local loadingFrame = Instance.new("Frame", gui)
+loadingFrame.Size = UDim2.new(1, 0, 1, 0)
+loadingFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+loadingFrame.Visible = false
+
+local loadingLabel = Instance.new("TextLabel", loadingFrame)
+loadingLabel.Size = UDim2.new(1, 0, 0, 50)
+loadingLabel.Position = UDim2.new(0, 0, 0.5, -25)
+loadingLabel.Text = "Loading xredx..."
+loadingLabel.Font = Enum.Font.GothamBold
+loadingLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+loadingLabel.BackgroundTransparency = 1
+loadingLabel.TextScaled = true
+
+-- MAIN GUI FRAME
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 350, 0, 250)
+mainFrame.Position = UDim2.new(0.5, -175, 0.5, -125)
+mainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Visible = false
+mainFrame.Parent = gui
+
+-- Title for Main GUI
+local mainTitle = Instance.new("TextLabel", mainFrame)
+mainTitle.Size = UDim2.new(1, 0, 0, 40)
+mainTitle.Position = UDim2.new(0, 0, 0, 0)
+mainTitle.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+mainTitle.Text = "xredx"
+mainTitle.TextColor3 = Color3.fromRGB(255, 0, 0)
+mainTitle.Font = Enum.Font.GothamBold
+mainTitle.TextScaled = true
+
+-- Close button
+local closeBtn = Instance.new("TextButton", mainFrame)
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -35, 0, 5)
+closeBtn.Text = "X"
+closeBtn.BackgroundColor3 = Color3.fromRGB(60, 0, 0)
+closeBtn.TextColor3 = Color3.fromRGB(255, 0, 0)
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextScaled = true
+closeBtn.MouseButton1Click:Connect(function()
+	mainFrame.Visible = false
+end)
+
+-- Utility to create buttons
+local function createButton(text, posY)
+	local btn = Instance.new("TextButton", mainFrame)
+	btn.Size = UDim2.new(0.9, 0, 0, 40)
+	btn.Position = UDim2.new(0.05, 0, 0, posY)
+	btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+	btn.TextColor3 = Color3.fromRGB(255, 0, 0)
+	btn.Font = Enum.Font.GothamBold
+	btn.Text = text
+	btn.TextScaled = true
+	btn.BorderSizePixel = 0
+	return btn
+end
+
+-- Noclip Button
+local noclipBtn = createButton("Unique Noclip", 50)
+local noclip = false
+noclipBtn.MouseButton1Click:Connect(function()
+	noclip = not noclip
+	runService.Stepped:Connect(function()
+		if noclip and player.Character then
+			for _, part in ipairs(player.Character:GetDescendants()) do
+				if part:IsA("BasePart") then
+					part.CanCollide = false
+				end
+			end
+		end
+	end)
+end)
+
+-- Speed 200 Button
+local speedBtn = createButton("Speed 200 Boost", 110)
+speedBtn.MouseButton1Click:Connect(function()
+	if player.Character and player.Character:FindFirstChild("Humanoid") then
+		player.Character.Humanoid.WalkSpeed = 200
+	end
+end)
+
+-- Handle Key Submission
+doneBtn.MouseButton1Click:Connect(function()
+	if inputBox.Text == "xredx" then
+		keyFrame.Visible = false
+		loadingFrame.Visible = true
+
+		task.wait(2.5) -- fake loading
+		loadingFrame.Visible = false
+		mainFrame.Visible = true
+	else
+		inputBox.Text = ""
+		inputBox.PlaceholderText = "Wrong Key. Try again."
+	end
+end)
