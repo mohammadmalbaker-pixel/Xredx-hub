@@ -1,0 +1,95 @@
+-- Rayfield UI Loader
+loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+
+-- Infinite Jump Setup
+local UserInputService = game:GetService("UserInputService")
+UserInputService.JumpRequest:Connect(function()
+    game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+end)
+
+-- Rayfield Setup
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "Lloyd The Green Master Script",
+    LoadingTitle = "Lloyd The Green Master Script",
+    LoadingSubtitle = "Made by Lloyd",
+    ConfigurationSaving = {
+        Enabled = false
+    },
+    Discord = {
+        Enabled = false
+    },
+    KeySystem = false,
+    ColorScheme = {
+        Theme = "Green"
+    }
+})
+
+-- Main Tab
+local MainTab = Window:CreateTab("Main", 4483362458)
+
+-- Speed Tab
+local SpeedTab = Window:CreateTab("Speed", 4483362458)
+
+-- Button: Jump Boost opens Speed tab
+MainTab:CreateButton({
+    Name = "Jump Boost",
+    Callback = function()
+        SpeedTab:Show()
+    end,
+})
+
+-- Button: Set Speed to 100
+SpeedTab:CreateButton({
+    Name = "Set Speed to 100",
+    Callback = function()
+        local char = game.Players.LocalPlayer.Character
+        if char and char:FindFirstChildOfClass("Humanoid") then
+            char:FindFirstChildOfClass("Humanoid").WalkSpeed = 100
+        end
+    end,
+})
+
+-- Button: Teleport Up
+MainTab:CreateButton({
+    Name = "Teleport Up",
+    Callback = function()
+        local char = game.Players.LocalPlayer.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            char.HumanoidRootPart.CFrame = char.HumanoidRootPart.CFrame + Vector3.new(0, 50, 0)
+        end
+    end,
+})
+
+-- TELEPORT TO PLAYER BY TYPING NAME
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local typedName = ""
+
+-- Textbox to enter player name
+MainTab:CreateInput({
+    Name = "Type Player Name to TP",
+    PlaceholderText = "Enter exact username...",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(text)
+        typedName = text
+    end,
+})
+
+-- Button to teleport to typed player
+MainTab:CreateButton({
+    Name = "Teleport to Typed Player",
+    Callback = function()
+        local target = Players:FindFirstChild(typedName)
+        if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character:MoveTo(target.Character.HumanoidRootPart.Position + Vector3.new(0, 3, 0))
+        else
+            Rayfield:Notify({
+                Title = "Teleport Failed",
+                Content = "Player not found or not loaded.",
+                Duration = 3,
+            })
+        end
+    end,
+})
